@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customizable Greeting Cards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #ffffff;
+    }
+
+    /* Main container with the frame */
+    .frame {
+      width: 90%; /* Adjust width as needed */
+      max-width: 560px; /* Maximum width */
+      padding: 20px; /* Space inside the frame */
+      border: 5px solid #0000000c; /* Stroke for the frame */
+      border-radius: 10px; /* Rounded corners */
+      background-color: white; /* Background color inside the frame */
+      box-shadow: 0 100px 400px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+      text-align: center;
+      position: relative;
+    }
+
+    /* Background image for the frame */
+    .frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('your-background-image.jpg') no-repeat center center;
+      background-size: cover; /* Makes the image cover the entire frame */
+      z-index: -1; /* Places the background behind the content */
+      border-radius: 10px; /* Align with the frame's border-radius */
+    }
+
+    /* Content inside the frame */
+    .container {
+      position: relative; /* Ensure this content is above the background */
+      z-index: 1;
+    }
+
+    .card-options {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
+    .card-options img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    .card-options img.selected {
+      border-color: #007bff;
+    }
+
+    canvas {
+      margin: 20px 0;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      width: 80%;
+      max-width: 250px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Frame with the entire content -->
+  <div class="frame">
+    <div class="container">
+      <h1>Customizable Greeting Cards</h1>
+      <p>Select a card design and enter your name to personalize it.</p>
+
+      <!-- Card Selection -->
+      <div class="card-options">
+        <img src="Mouckup 1.jpeg" alt="Card 1" id="card1" class="card-thumbnail">
+        <img src="Mouckup  2.jpeg" alt="Card 2" id="card2" class="card-thumbnail">
+        <img src="Mouckup  3.jpeg" alt="Card 3" id="card3" class="card-thumbnail">
+      </div>
+
+      <!-- Input Fields -->
+      <div class="form-group">
+        <input type="text" id="firstName" placeholder="First Name">
+      </div>
+      <div class="form-group">
+        <input type="text" id="lastName" placeholder="Last Name">
+      </div>
+
+      <!-- Canvas for Live Preview -->
+      <canvas id="cardCanvas" width="700" height="700"></canvas>
+
+      <!-- Download Button -->
+      <button id="downloadButton">Download Your Card</button>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript logic
+    const cardThumbnails = document.querySelectorAll('.card-thumbnail');
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const downloadButton = document.getElementById('downloadButton');
+
+    let selectedCard = 'card1.jpg'; // Default card
+
+    // Function to load selected card onto the canvas
+    function loadCard() {
+      const img = new Image();
+      img.src = selectedCard;
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw card
+        addText(); // Add text after drawing
+      };
+    }
+
+    // Function to add text to the canvas
+    function addText() {
+      const firstName = firstNameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      ctx.font = '48px Arial';
+      ctx.fillStyle = '#007bff'; // Customize text color
+      ctx.textAlign = 'center';
+      ctx.fillText(fullName, canvas.width / 2, canvas.height - 50); // Position text
+    }
+
+    // Update card when user types in inputs
+    firstNameInput.addEventListener('input', loadCard);
+    lastNameInput.addEventListener('input', loadCard);
+
+    // Update selected card
+    cardThumbnails.forEach(thumbnail => {
+      thumbnail.addEventListener('click', () => {
+        cardThumbnails.forEach(img => img.classList.remove('selected'));
+        thumbnail.classList.add('selected');
+        selectedCard = thumbnail.src; // Set selected card
+        loadCard();
+      });
+    });
+
+    // Download the customized card
+    downloadButton.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'customized-card.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Initial card load
+    loadCard();
+  </script>
+</body>
+</html>
